@@ -24,8 +24,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build -t devops-node-app .
-          docker tag devops-node-app:latest <YOUR_ECR_URI>:latest
-          docker push <public.ecr.aws/j1j1g4e3/devops-node-app>:latest
+          docker tag devops-node-app:latest 359642224114.dkr.ecr.us-east-1.amazonaws.com/devops-node-app:latest
+          docker push 359642224114.dkr.ecr.us-east-1.amazonaws.com/devops-node-app:latest
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -34,6 +34,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <YOUR_ECR_URI>
-            docker pull <YOUR_ECR_URI>:latest
-            kubectl rollout restart deployment/devops-app-deployment
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 359642224114.dkr.ecr.us-east-1.amazonaws.com
+            docker pull 359642224114.dkr.ecr.us-east-1.amazonaws.com/devops-node-app:latest
+            docker stop devops-app || true
+            docker rm devops-app || true
+            docker run -d --name devops-app -p 80:3000 359642224114.dkr.ecr.us-east-1.amazonaws.com/devops-node-app:latest
