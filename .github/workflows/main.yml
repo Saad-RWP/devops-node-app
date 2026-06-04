@@ -17,8 +17,8 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
       - name: Build and Push
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/my-app:latest .
-          docker push ${{ secrets.ECR_REGISTRY }}/my-app:latest
+          docker build -t ${{ secrets.ECR_REGISTRY }}/devops-node-app:latest .
+          docker push ${{ secrets.ECR_REGISTRY }}/devops-node-app:latest
       - name: SSH and Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -27,5 +27,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            docker pull ${{ secrets.ECR_REGISTRY }}/my-app:latest
+            docker pull ${{ secrets.ECR_REGISTRY }}/devops-node-app:latest
             kubectl rollout restart deployment/devops-app
